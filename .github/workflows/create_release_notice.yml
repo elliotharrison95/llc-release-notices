@@ -1,0 +1,29 @@
+name: Create Release Notice
+
+on: [push]
+
+jobs:
+  create_release_notice:
+    name: Create release notice
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo's default branch
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Create release notice JSON
+        run: python create_output_file.py
+      - name: Check if there are any changes
+        id: verify_diff
+        run: |
+          git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
+      - name: Commit json to repo
+        if: steps.verify_diff.outputs.changed == 'true'
+        run: |
+          git config --global user.email "${{github.event.publisher.email}}"
+          git config --global user.name "${{github.actor}}"
+          git add -A
+          git commit -m 'Updated release json'
+          git push
