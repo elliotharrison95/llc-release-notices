@@ -1,4 +1,5 @@
 import os, json
+from urllib.parse import quote
 
 base_url = 'https://landregistry.github.io/llc-release-notices/releases/'
 
@@ -12,7 +13,7 @@ def create_output(service):
   for file_object in os.scandir(f'releases/{service}'):
     filename = file_object.name
     if filename.endswith('.pdf'):
-      link = f'{base_url}{service}/{filename}'.replace(' ', '%20')
+      link = f'{base_url}{service}/{quote(filename)}'
       output.append({"name": filename.replace('.pdf', ''), "link": link})
 
     with open(files[service], 'w') as outputfile:
